@@ -1,0 +1,190 @@
+{
+  "doc_id": "demo-bonterms-001",
+  "title": "Bonterms Professional Services Agreement (Version 1.2)",
+  "chunk_count": 15,
+  "total_tokens": 9952,
+  "chunks": [
+    {
+      "id": "bonterms-professional-services-agreement-version-12-0",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)"
+      ],
+      "heading": "Bonterms Professional Services Agreement (Version 1.2)",
+      "token_count": 153,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "definitions-1",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Definitions."
+      ],
+      "heading": "Definitions.",
+      "token_count": 1586,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "services-2",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Services."
+      ],
+      "heading": "Services.",
+      "token_count": 348,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "34-will-apply-3",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Services.",
+        "3.4 will apply."
+      ],
+      "heading": "3.4 will apply.",
+      "token_count": 640,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "communication-and-escalation-4",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Communication and Escalation."
+      ],
+      "heading": "Communication and Escalation.",
+      "token_count": 300,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "creation-of-deliverables-5",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Creation of Deliverables."
+      ],
+      "heading": "Creation of Deliverables.",
+      "token_count": 367,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "rights-in-deliverables-6",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Rights in Deliverables."
+      ],
+      "heading": "Rights in Deliverables.",
+      "token_count": 1046,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "representations-and-warranties-7",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Representations and Warranties."
+      ],
+      "heading": "Representations and Warranties.",
+      "token_count": 912,
+      "element_types": [
+        "list",
+        "paragraph"
+      ]
+    },
+    {
+      "id": "customer-materials-systems-and-facilities-8",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Customer Materials, Systems and Facilities."
+      ],
+      "heading": "Customer Materials, Systems and Facilities.",
+      "token_count": 630,
+      "element_types": [
+        "list",
+        "paragraph"
+      ]
+    },
+    {
+      "id": "fees-and-expenses-9",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Fees and Expenses."
+      ],
+      "heading": "Fees and Expenses.",
+      "token_count": 478,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "term-and-termination-10",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Term and Termination."
+      ],
+      "heading": "Term and Termination.",
+      "token_count": 526,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "limitations-of-liability-11",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Limitations of Liability."
+      ],
+      "heading": "Limitations of Liability.",
+      "token_count": 232,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "indemnification-12",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Indemnification."
+      ],
+      "heading": "Indemnification.",
+      "token_count": 673,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "confidentiality-13",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "Confidentiality."
+      ],
+      "heading": "Confidentiality.",
+      "token_count": 817,
+      "element_types": [
+        "list"
+      ]
+    },
+    {
+      "id": "general-terms-14",
+      "path": [
+        "Bonterms Professional Services Agreement (Version 1.2)",
+        "General Terms."
+      ],
+      "heading": "General Terms.",
+      "token_count": 1244,
+      "element_types": [
+        "list"
+      ]
+    }
+  ]
+}
