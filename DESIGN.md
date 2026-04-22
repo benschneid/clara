@@ -58,11 +58,21 @@ The parser uses a two-pass strategy: Word heading styles first, then a numbered-
 
 Token counts use a `len(text) / 4` approximation rather than running `tiktoken`. This avoids an extra dependency and is accurate to within ~10% for English legal prose. The counts are used for budgeting guidance, not hard limits, so this precision is sufficient.
 
+**`element_types` in the manifest**
+
+Each manifest entry includes the element types present in that chunk (paragraph, list, table). This is low cost to include — we track it during parsing anyway — and gives an agent a small amount of extra signal when deciding what to fetch without having to fetch the content first. For example, an agent asked to "summarize the payment terms table" could filter the manifest for chunks containing `"table"` before fetching. In practice, for most contract review questions the heading name alone is sufficient to make that decision, so this field is a nice-to-have rather than load-bearing to the core design.
+
 ---
 
 ### What the system does not yet handle well
 
-- **Table-of-contents bleed**: Legacy contracts that embed a TOC as body text (contract 1) produce spurious small chunks from the TOC entries before the actual body sections begin. A production parser would detect and skip the TOC region.
+- **Table-of-contents bleed**: Legacy contracts that embed a TOC as body text (contract 1) produce spurious small chunks from the TOC entries before the actual body sections begin. This was observed directly in `example_contract_1.docx` — the heading detector fires on lines like `"9.1 Confidentiality...34"` from the TOC, creating near-empty chunks before the real section body appears. A production parser would filter lines matching the `......  34` page-number pattern and skip the TOC region entirely.
+
+- **Manually formatted lists**: Contracts that use `(a)`, `(b)`, `(c)` typed as plain paragraphs — rather than applying Word's list styles — are classified as `paragraph` in `element_types`, not `list`. The content is still present and readable, but the metadata is inaccurate.
+
+- **No file size limit**: The upload endpoint accepts arbitrarily large files. Production would set a max upload size to prevent the service from being overwhelmed by a large file.
+
+- **Temp file cleanup**: The current code deletes the temp file in a `finally` block which covers most failure cases, but a hard process crash mid-parse would leave the file on disk. Production would use Python's `tempfile` context manager for guaranteed cleanup.
 
 - **Cross-references**: Contracts frequently say "as defined in Section 2.1" or "subject to Section 13.3(b)". The service does not resolve these — the agent must follow up with a targeted fetch. A graph of cross-references between chunks would improve agent reasoning on complex interdependencies.
 
@@ -72,22 +82,26 @@ Token counts use a `len(text) / 4` approximation rather than running `tiktoken`.
 
 - **Style-free heading detection edge cases**: All-caps short lines are treated as potential headings in the fallback heuristic. In some documents this misfires on chapter epigraphs, definitions, or exhibit labels.
 
-- **No authentication / multi-tenancy**: The current store is global. Any caller can fetch any document by guessing a `doc_id`. Production would scope documents to an authenticated user or session.
+- **No authentication / multi-tenancy**: The current store is global. `doc_id` alone is not access control — while UUIDs are hard to guess, they are not a substitute for auth. Production would scope documents to an authenticated user so no cross-tenant document access is possible.
 
 ---
 
 ### What I would do with 10× the time
 
-1. **Persistent storage with Postgres + pgvector.** Store chunks in a `chunks` table with a `tsvector` column for keyword search and a `vector` column for semantic similarity. This enables both structural navigation (manifest) and semantic retrieval ("find the clause about indemnification caps") in a single service, and survives restarts.
+1. **Persistent storage with Postgres + pgvector.** Store chunks in a `chunks` table with a `tsvector` column for keyword search and a `vector` column for semantic similarity. This enables both structural navigation (manifest) and semantic retrieval ("find the clause about indemnification caps") in a single service, and survives restarts. The original uploaded `.docx` files would live in S3; the parsed chunks would live in Postgres — S3 for cheap durable storage of raw files, Postgres for everything the application actually queries against.
 
-2. **Embedding generation on ingest.** Run each chunk through an embedding model at upload time. Expose a `GET /documents/{doc_id}/search?q=...` endpoint that returns the top-k semantically similar chunks. This dramatically improves recall for agents working with non-standard or poorly structured contracts.
+2. **Idempotent uploads via file hashing.** Hash the raw file bytes (SHA-256) on upload and check for an existing `doc_id` before parsing. Return the existing manifest immediately if the file has already been processed. Parsing is the expensive step; hashing is a few milliseconds regardless of file size.
 
-3. **Cross-reference graph.** Parse section references (regex over chunk content) and build an adjacency list. Expose it on the manifest so an agent can navigate to referenced sections without knowing their IDs in advance.
+3. **Authentication and document scoping.** `doc_id` alone is not access control. Production would require API key auth on every endpoint and scope documents to an authenticated user or organization.
 
-4. **PDF support via pdfplumber / Textract.** Detect file type at upload, route to the appropriate parser. For scanned PDFs, integrate an OCR pipeline with layout analysis to recover heading structure.
+4. **Embedding generation on ingest.** Run each chunk through an embedding model at upload time. Expose a `GET /documents/{doc_id}/search?q=...` endpoint that returns the top-k semantically similar chunks. This improves recall for agents working with non-standard or poorly structured contracts where heading names alone are insufficient to navigate.
 
-5. **Streaming ingest.** For very large documents (100+ pages), return the manifest as a streaming response so the agent can begin working before parsing completes.
+5. **Cross-reference graph.** Parse section references (regex over chunk content) and build an adjacency list. Expose it on the manifest so an agent can navigate to referenced sections without knowing their IDs in advance.
 
-6. **Redline / tracked-change support.** Surface inserted and deleted runs in a structured way so an agent reviewing a negotiated contract can reason about what changed, not just what the final text is.
+6. **PDF support via pdfplumber / Textract.** Detect file type at upload, route to the appropriate parser. For scanned PDFs, integrate an OCR pipeline with layout analysis to recover heading structure.
 
-7. **Richer element metadata.** Tag defined terms (quoted phrases followed by "means" or "shall mean"), parties, dates, and monetary figures at the chunk level. This lets an agent quickly locate key terms without reading the definitions section in full.
+7. **Streaming ingest.** For very large documents (100+ pages), return the manifest as a streaming response so the agent can begin working before parsing completes.
+
+8. **Redline / tracked-change support.** Surface inserted and deleted runs in a structured way so an agent reviewing a negotiated contract can reason about what changed, not just what the final text is.
+
+9. **Richer element metadata.** Tag defined terms (quoted phrases followed by "means" or "shall mean"), parties, dates, and monetary figures at the chunk level. This lets an agent quickly locate key terms without reading the definitions section in full.
